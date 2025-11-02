@@ -1,9 +1,3 @@
-# A Production-Ready Python Script for Automated, Incremental Telegram Channel Scraping.
-# Designed for continuous operation on a server using the 'schedule' library.
-#
-# NEW DEPENDENCIES REQUIRED:
-# pip install telethon pandas schedule
-
 from telethon.sync import TelegramClient
 from telethon.tl.functions.messages import GetHistoryRequest
 import csv
@@ -14,12 +8,10 @@ import time
 import schedule 
 import pandas as pd 
 
-# --- CONFIGURATION (User Data Integrated) ---
 API_ID = 23618024  
 API_HASH = 'd9a483f0afb5f2583c937d87252747b4' 
 PHONE_NUMBER = '+251960496143'
 
-# --- AUTOMATION & LIMITS ---
 SCHEDULE_INTERVAL_MINUTES = 60
 LIMIT_MESSAGES_PER_CHANNEL = 200
 
@@ -31,11 +23,8 @@ CHANNELS = [
 OUTPUT_FILE_RAW = 'telegram_posts_raw.csv'
 OUTPUT_FILE_CLEAN = 'data_for_analysis.csv'
 
-# --- CRITICAL FIX: Ensure session file is created/loaded in the current directory ---
-# This ensures the scraper works correctly when launched via 'nohup' or scheduled tasks.
 SESSION_NAME = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'scraper_session')
 
-# --- UTILITY FUNCTIONS ---
 def is_sold_post(text):
     if not text: return True
     sold_keywords = [
@@ -84,7 +73,6 @@ def get_existing_ids(filepath):
     return existing_ids
 
 
-# --- STAGE 1: SCRAPING AND RAW DATA COLLECTION ---
 
 async def scrape_channel(client, channel_username, writer, existing_ids):
     print(f"[{time.strftime('%H:%M:%S')}] Starting incremental scrape for {channel_username}...")
@@ -166,7 +154,6 @@ async def main_scraper_task():
     print(f"--- SCRAPER JOB FINISHED at {time.strftime('%Y-%m-%d %H:%M:%S')} ---")
 
 
-# --- STAGE 2: DATA CLEANING AND PREPARATION (FOR FRONTEND/MODEL) ---
 
 def clean_and_prepare_data():
     if not os.path.exists(OUTPUT_FILE_RAW):
@@ -183,7 +170,6 @@ def clean_and_prepare_data():
         df['date'] = pd.to_datetime(df['date'])
         df.dropna(subset=['simple_price_etb'], inplace=True)
         
-        # Save to a clean JSON file for easy website reading (Websites prefer JSON over CSV)
         df.to_json(OUTPUT_FILE_CLEAN.replace('.csv', '.json'), orient='records', date_format='iso', indent=4)
         
         print(f"[{time.strftime('%H:%M:%S')}] Data cleaning complete. {len(df)} unique records saved to {OUTPUT_FILE_CLEAN.replace('.csv', '.json')}")
@@ -192,11 +178,10 @@ def clean_and_prepare_data():
         print(f"CRITICAL ERROR during data cleaning: {e}")
 
 
-# --- EXECUTION AND SCHEDULING LOOP (Server-Ready) ---
 
 def scheduled_job_wrapper():
     try:
-        asyncio.run(main_scraper_task())  # Properly manage the event loop
+        asyncio.run(main_scraper_task()) 
     except RuntimeError as e:
         print(f"[{time.strftime('%H:%M:%S')}] Error: {e}")
 

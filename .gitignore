@@ -1,8 +1,6 @@
 venv/
-
-/BackEnd/data_for_analysis.json
-/BackEnd/scraper_session.session
-/BackEnd/telegram_posts_raw.csv
-
+.csv
+db.sqlite3
+.db
 __pycache__/
 *.pyc
