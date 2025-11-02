@@ -7,6 +7,7 @@ from django.shortcuts import redirect
 from django.contrib import decorators
 from django.contrib.auth.decorators import login_required
 from django.views.decorators.csrf import csrf_exempt
+from .models import Products
 
 def login_view(request):
     form = LoginForm()
